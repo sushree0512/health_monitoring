@@ -1,0 +1,102 @@
+import pickle
+import streamlit as st
+from streamlit_option_menu import option_menu
+
+dia_model = pickle.load(open("C:/Users/shubh_k1hia0t/OneDrive/Desktop/Aiml_project/savedmodels/diabetic_model.sav", 'rb'))
+heart_model = pickle.load(open("C:/Users/shubh_k1hia0t/OneDrive/Desktop/Aiml_project/savedmodels/diabetic_model.sav", 'rb'))
+kidney_model = pickle.load(open("C:/Users/shubh_k1hia0t/OneDrive/Desktop/Aiml_project/savedmodels/diabetic_model.sav", 'rb'))
+
+with st.sidebar:
+    
+    selected = option_menu('Healthcare tracking System',
+                           ['Diabetes Prediction',
+                            'Heart Disease Prediction',
+                            'Kidney Disease Prediction'],
+                            icons=['activity', 'heart', 'person'],
+                           default_index=0)
+                           
+# Diabetes Prediction Page
+if (selected == 'Diabetes Prediction'):
+    
+    st.title('Diabetes Prediction using ML')
+    col1, col2, col3  = st.columns(3)
+    
+    with col1:
+        Glucose = st.number_input('Glucose Level', min_value=0.0, max_value=500.0)
+    with col2:
+        BloodPressure = st.text_input('Blood Pressure value')   
+    with col3:
+        Insulin = st.text_input('Insulin Level')
+    with col1:
+        BMI = st.number_input('BMI value', min_value=0.0, max_value=50.0)
+    with col2:
+        DiabetesPedigreeFunction = st.number_input('Diabetes Pedigree Function value', min_value=0.0, max_value=2.0)
+    with col3:
+        Age = st.number_input('Age of the Person', min_value=0, max_value=150)
+    dia_diagnosis = ''
+    if st.button('Diabetes Test Result'):
+        dia_prediction = dia_model.predict([[Glucose, BloodPressure, Insulin, BMI, DiabetesPedigreeFunction, Age]])
+        if (dia_prediction[0] == 1):
+            dia_diagnosis = 'The person is diabetic'
+        else:
+            dia_diagnosis = 'The person is not diabetic'
+    st.success(dia_diagnosis)
+    
+    
+if (selected == 'Heart Disease Prediction'):
+    
+    st.title('Heart Disease Prediction using ML')
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        age = st.number_input('Age', min_value=0, max_value=150)
+    with col2:
+        cp = st.number_input('Chest Pain types', min_value=0, max_value=4)
+    with col3:
+        trestbps = st.number_input('Resting Blood Pressure', min_value=0, max_value=250)
+    with col1:
+        restecg = st.number_input('Resting Electrocardiographic results', min_value=0, max_value=2)
+    with col2:
+        thalach = st.number_input('Maximum Heart Rate achieved', min_value=0, max_value=300)
+    with col3:
+        exang = st.number_input('Exercise Induced Angina', min_value=0, max_value=1)
+    with col1:
+        oldpeak = st.number_input('ST depression induced by exercise', min_value=0.0, max_value=10.0)
+    with col2:
+        slope = st.number_input('Slope of the peak exercise ST segment', min_value=0, max_value=2)
+    with col3:
+        ca = st.number_input('Major vessels colored by flourosopy', min_value=0, max_value=4)
+    with col1:
+        thal = st.number_input('thal: 0 = normal; 1 = fixed defect; 2 = reversable defect', min_value=0, max_value=2)
+    heart_diagnosis = ''
+    if st.button('Heart Disease Test Result'):
+        heart_prediction = heart_model.predict([[age, cp, trestbps, restecg, thalach, exang, oldpeak, slope, ca, thal]])
+        if (heart_prediction[0] == 1):
+            heart_diagnosis = 'The person is having heart disease'
+        else:
+            heart_diagnosis = 'The person does not have any heart disease'
+    st.success(heart_diagnosis)
+
+if selected == 'Kidney Disease Prediction':
+    st.title('Kidney Disease Prediction using ML')
+    
+    with st.form(key='kidney_form'):
+        age = st.number_input('Age:', min_value=0, max_value=150)
+        sg = st.number_input('Specific Gravity (sg):', min_value=0.0, max_value=2.0)
+        al = st.number_input('Albumin (al):', min_value=0.0, max_value=5.0)
+        su = st.number_input('Sugar (su):', min_value=0.0, max_value=5.0)
+        bgr = st.number_input('Blood Glucose Random (bgr):', min_value=0.0, max_value=500.0)
+        bu = st.number_input('Blood Urea (bu):', min_value=0.0, max_value=200.0)
+        submit_button = st.form_submit_button(label='Predict Kidney Disease')
+    
+    kidney_diagnosis = ''
+    
+    if submit_button:
+        # Make predictions using your kidney_model
+        kidney_prediction = kidney_model.predict([[age, sg, al, su, bgr, bu]])
+        
+        if kidney_prediction[0] == 1:
+            kidney_diagnosis = 'The person has Kidney disease'
+        else:
+            kidney_diagnosis = 'The person does not have Kidney disease'
+    
+    st.success(kidney_diagnosis)
